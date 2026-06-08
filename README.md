@@ -1,7 +1,7 @@
 # ⚡ Predicción del Precio de Bolsa — Mercado Eléctrico Colombiano
 
 > **Proyecto Integrador — Maestría en Ciencia de Datos y Analítica**  
-> Universidad EAFIT · 2025
+> Universidad EAFIT · 2026
 
 ---
 
@@ -165,5 +165,5 @@ Universidad EAFIT. No está destinado a uso comercial.
 ---
 
 <p align="center">
-  Universidad EAFIT · Maestría en Ciencia de Datos y Analítica · 2025
+  Universidad EAFIT · Maestría en Ciencia de Datos y Analítica · 2026
 </p>
