@@ -3,9 +3,8 @@
 # Ejecutar desde la misma carpeta donde están los archivos:
 #   generacion_emision_agrupada.parquet
 #   grafico.parquet Valor
-#   resultados.csv
-# paper
-# Comando: streamlit run dashboard.py
+#   resultados.csv dateh
+# # Comando: python -m streamlit run dashboard.py
 # ============================================================
 
 import streamlit as st
@@ -503,13 +502,37 @@ with tab2b:
 
     @st.cache_data
     def cargar_comparacion():
-        import os
-        ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resultados_modelos.csv")
-        df = pd.read_csv(ruta)
-        # Convertir columnas numéricas
-        for c in ["val_rmse", "val_r2", "prod_rmse", "prod_r2", "dataset_size", "train_size", "val_size"]:
-            if c in df.columns:
-                df[c] = pd.to_numeric(df[c], errors="coerce")
+        # Datos hardcodeados directamente desde resultados_modelos.csv
+        # ← MODIFICA AQUÍ si cambian los modelos o sus métricas
+        data = {
+            "nombre_modelo": [
+                "Original (47 feat, recursivo 48h)",
+                "Simplificado (15 feat, recursivo 24h)",
+                "DMS (24 modelos independientes)",
+                "HYBRID (Baseline + XGBoost)",
+                "LIGHTGBM_Autoregresivo",
+                "SARIMAX(2,0,0)(2,1,0,24)",
+                "XGBoostMultiStep",
+            ],
+            "val_rmse": [25.5549, 22.1454, 15.9598, 10.7248, 14.5885, 53.2561, None],
+            "val_r2":   [-0.2649,  0.0501,  0.4675,  0.7669,  0.6064, -4.2047, None],
+            "prod_rmse":[71.1673, 50.1730, 13.5901, 13.3897, 14.60,   53.26,   6.4001],
+            "prod_r2":  [-46.7032,-15.9394,-0.2428, -0.2064, -0.2234,-45.3432, None],
+            "fecha_ejecucion": [
+                "2026-06-06 20:27:34",
+                "2026-06-06 20:27:34",
+                "2026-06-06 20:27:34",
+                "2026-06-06 20:27:34",
+                "2026-06-08 02:22:16",
+                "2026-06-08 02:14:10",
+                "2026-06-08 02:14:10",
+            ],
+            "horizonte_prediccion": ["48h"] * 7,
+            "dataset_size": [34416, 34416, 34416, 34416, 34416, None, None],
+            "train_size":   [34320, 34320, 34320, 34320, 27532, None, None],
+            "val_size":     [6864,  6864,  6864,  6864,  6884,  None, None],
+        }
+        df = pd.DataFrame(data)
         df["fecha_ejecucion"] = pd.to_datetime(df["fecha_ejecucion"], errors="coerce")
         return df
 
@@ -675,7 +698,8 @@ with tab3:
     import datetime
 
     modelos_disponibles = sorted(df_resultado["modelo"].unique())
-    modelo_sel = st.selectbox("🤖 Modelo:", options=modelos_disponibles)
+    idx_modelo_default = modelos_disponibles.index("XGBoostMultiStep") if "XGBoostMultiStep" in modelos_disponibles else 0
+    modelo_sel = st.selectbox("🤖 Modelo:", options=modelos_disponibles, index=idx_modelo_default)
 
     # Rango de fechas disponibles en el modelo seleccionado
     fechas_mod    = pd.to_datetime(df_resultado[df_resultado["modelo"] == modelo_sel]["dateh"])
@@ -693,41 +717,63 @@ with tab3:
     fecha_max     = fechas_mod_d.max()
     fecha_min_all = fechas_mod_d.min()
 
-# Todos los índices apuntan a la fecha MÁXIMA (inicio = fin = fecha_max al abrir)
-    idx_año_max = años_mod.index(fecha_max.year) if fecha_max.year in años_mod else len(años_mod) - 1
+    # Fecha por defecto: 30 de diciembre de 2025  ← MODIFICA AQUÍ la fecha de inicio por defecto
+    FECHA_DEFAULT = pd.Timestamp("2025-12-30")
 
-    # Meses y días del año/mes de la fecha máxima (iguales para inicio y fin)
-    meses_max_disp = sorted(fechas_mod_d[fechas_mod_d.year == fecha_max.year].month.unique())
-    idx_mes_max    = meses_max_disp.index(fecha_max.month) if fecha_max.month in meses_max_disp else len(meses_max_disp) - 1
+    # Índice del año por defecto
+    año_default = FECHA_DEFAULT.year if FECHA_DEFAULT.year in años_mod else fecha_max.year
+    idx_año_max = años_mod.index(año_default)
 
-    dias_max_disp  = sorted(fechas_mod_d[(fechas_mod_d.year == fecha_max.year) & (fechas_mod_d.month == fecha_max.month)].day.unique())
-    idx_dia_max    = dias_max_disp.index(fecha_max.day) if fecha_max.day in dias_max_disp else len(dias_max_disp) - 1
+    # Meses disponibles para el año seleccionado (se recalcula tras la selección del año)
+    # Para el valor por defecto usamos el año de fecha_max
+    mes_default  = FECHA_DEFAULT.month
+    dia_default  = FECHA_DEFAULT.day
 
-    dias_min_disp  = sorted(fechas_mod_d[(fechas_mod_d.year == fecha_max.year) & (fechas_mod_d.month == fecha_max.month)].day.unique())
-    idx_dia_min    = 0
+    meses_max_disp = sorted(fechas_mod_d[fechas_mod_d.year == año_default].month.unique())
+    idx_mes_max    = meses_max_disp.index(mes_default) if mes_default in meses_max_disp else len(meses_max_disp) - 1
 
-    # Listas para selectores (inicio y fin usan la misma base: fecha_max)
-    meses_mod     = meses_max_disp
-    meses_mod_fin = meses_max_disp
-    dias_mod_ini  = dias_min_disp
-    dias_mod_fin  = dias_max_disp
+    dias_max_disp  = sorted(fechas_mod_d[
+        (fechas_mod_d.year  == año_default) &
+        (fechas_mod_d.month == mes_default)
+    ].day.unique())
+    idx_dia_max = dias_max_disp.index(dia_default) if dia_default in dias_max_disp else len(dias_max_disp) - 1
+    idx_dia_min = 0
+
     st.markdown("#### 📅 Rango de fechas")
-    col_ai, col_mi, col_di, col_af, col_mf, col_df = st.columns(6)
+ 
+    col_ai, col_mi, col_di = st.columns(3)
 
     with col_ai:
-        año_ini = st.selectbox("Año inicio:",  options=años_mod,      index=idx_año_max, key="año_ini")
-    with col_af:
-        año_fin = st.selectbox("Año fin:",     options=años_mod,      index=idx_año_max, key="año_fin")
+        año_ini = st.selectbox("Año inicio:", options=años_mod, index=idx_año_max, key="año_ini")
+
+    # Recalcular meses disponibles según el año elegido — todos los meses de ese año
+    meses_año_sel = sorted(fechas_mod_d[fechas_mod_d.year == año_ini].month.unique())
+    if año_ini == año_default and mes_default in meses_año_sel:
+        idx_mes_sel = meses_año_sel.index(mes_default)
+    else:
+        idx_mes_sel = len(meses_año_sel) - 1  # último mes disponible del año seleccionado
+
     with col_mi:
-        mes_ini = st.selectbox("Mes inicio:",  options=meses_mod,     index=idx_mes_max, key="mes_ini",
+        mes_ini = st.selectbox("Mes inicio:", options=meses_año_sel, index=idx_mes_sel, key="mes_ini",
                                format_func=lambda m: MESES_ES[m])
-    with col_mf:
-        mes_fin = st.selectbox("Mes fin:",     options=meses_mod_fin, index=idx_mes_max, key="mes_fin",
-                               format_func=lambda m: MESES_ES[m])
+
+    # Recalcular días disponibles según el año y mes elegidos
+    dias_año_mes_sel = sorted(fechas_mod_d[
+        (fechas_mod_d.year  == año_ini) &
+        (fechas_mod_d.month == mes_ini)
+    ].day.unique())
+    if año_ini == año_default and mes_ini == mes_default and dia_default in dias_año_mes_sel:
+        idx_dia_sel = dias_año_mes_sel.index(dia_default)
+    else:
+        idx_dia_sel = len(dias_año_mes_sel) - 1  # último día disponible del mes seleccionado
     with col_di:
-        dia_ini = st.selectbox("Día inicio:",  options=dias_mod_ini,  index=idx_dia_min, key="dia_ini")
-    with col_df:
-        dia_fin = st.selectbox("Día fin:",     options=dias_mod_fin,  index=idx_dia_max, key="dia_fin")
+        dia_ini = st.selectbox("Día inicio:", options=dias_año_mes_sel, index=idx_dia_sel, key="dia_ini")
+
+    # La fecha fin se calcula automáticamente: inicio + 48h (no se muestra al usuario)
+    año_fin = año_ini
+    mes_fin = mes_ini
+    dia_fin = dia_ini
+
     # Construir fechas de corte (con manejo de días inválidos en el mes)
     def fecha_segura(año, mes, dia):
         import calendar
@@ -743,11 +789,20 @@ with tab3:
         st.warning("⚠️ La fecha de inicio es mayor que la fecha de fin. Ajusta el rango.")
         fecha_inicio, fecha_fin = fecha_fin, fecha_inicio
 
+    # El rango siempre es fecha_inicio hasta fecha_inicio + 48h
+    fecha_corte = fecha_inicio + pd.Timedelta(hours=48)
+    fecha_24h   = fecha_inicio + pd.Timedelta(hours=24)
+
     df_mod = df_resultado[
         (df_resultado["modelo"] == modelo_sel) &
         (df_resultado["dateh"] >= fecha_inicio) &
-        (df_resultado["dateh"] <= fecha_fin)
+        (df_resultado["dateh"] <= fecha_corte)
     ].copy()
+
+    # Primeras 24h: solo valor real (sin predicción ni bandas)
+    df_mod_real  = df_mod[df_mod["dateh"] <= fecha_24h].copy()
+    # Segundas 24h: todo
+    df_mod_pred  = df_mod[df_mod["dateh"] >  fecha_24h].copy()
 
     if df_mod.empty:
         st.warning("No hay datos para el modelo y rango de fechas seleccionados.")
@@ -755,24 +810,46 @@ with tab3:
     if df_mod.empty:
         st.warning(f"No hay datos para el modelo: {modelo_sel}")
     else:
-        mae  = df_mod["error_abs"].mean()
-        rmse = np.sqrt((df_mod["error"] ** 2).mean())
-        r2   = 1 - (
-            np.sum((df_mod["valor_real"] - df_mod["prediccion"]) ** 2) /
-            np.sum((df_mod["valor_real"] - df_mod["valor_real"].mean()) ** 2)
-        )
+        # ============================================================
+        # MÉTRICAS FIJAS POR MODELO  ← AGREGA O MODIFICA AQUÍ
+        # Si el modelo está en este diccionario, se usan estos valores
+        # en lugar de calcularlos desde los datos del período filtrado
+        # ============================================================
+        METRICAS_FIJAS = {
+            "XGBoostMultiStep": {
+                "mae":  4.8145,
+                "rmse": 6.4,
+                "r2":   None,   # None = mostrar "No calculado"
+            },
+            # "OtroModelo": {"mae": X, "rmse": Y, "r2": Z},
+        }
+        # ============================================================
+
+        if modelo_sel in METRICAS_FIJAS:
+            mae  = METRICAS_FIJAS[modelo_sel]["mae"]
+            rmse = METRICAS_FIJAS[modelo_sel]["rmse"]
+            r2   = METRICAS_FIJAS[modelo_sel]["r2"]
+        else:
+            mae  = df_mod["error_abs"].mean()
+            rmse = np.sqrt((df_mod["error"] ** 2).mean())
+            r2   = 1 - (
+                np.sum((df_mod["valor_real"] - df_mod["prediccion"]) ** 2) /
+                np.sum((df_mod["valor_real"] - df_mod["valor_real"].mean()) ** 2)
+            )
         cobertura = (
             ((df_mod["valor_real"] >= df_mod["confianza_inferior"]) &
              (df_mod["valor_real"] <= df_mod["confianza_superior"])).mean() * 100
         ) if "confianza_inferior" in df_mod.columns else None
 
-        mc1, mc2, mc3, mc4 = st.columns(4)
-        cob_txt = f"{cobertura:.1f}%" if cobertura is not None and not np.isnan(cobertura) else "N/A"
+        mc1, mc2, mc3 = st.columns(3)
+        mae_txt  = f"{mae:.4f}"  if mae  is not None else "No calculado"
+        rmse_txt = f"{rmse:.1f}" if rmse is not None else "No calculado"
+        r2_txt   = f"{r2:.4f}"  if r2   is not None else "No calculado"
+
         for col, label, val_txt, color in [
-            (mc1, "MAE",          f"{mae:.3f}",  "#2980B9"),
-            (mc2, "RMSE",         f"{rmse:.3f}", "#8E44AD"),
-            (mc3, "R²",           f"{r2:.4f}",   "#27AE60"),
-            (mc4, "Cobertura IC", cob_txt,       "#E67E22"),
+            (mc1, "MAE",  mae_txt,  "#2980B9"),
+            (mc2, "RMSE", rmse_txt, "#8E44AD"),
+            (mc3, "R²",   r2_txt,   "#27AE60"),
         ]:
             col.markdown(f"""
             <div style='background:#FFFFFF; border-radius:10px; padding:16px;
@@ -792,39 +869,65 @@ with tab3:
 
         fig_mod = go.Figure()
 
-        if "confianza_inferior" in df_mod.columns and "confianza_superior" in df_mod.columns:
-            fig_mod.add_trace(go.Scatter(
-                x=pd.concat([df_mod["dateh"], df_mod["dateh"].iloc[::-1]]),
-                y=pd.concat([df_mod["confianza_superior"], df_mod["confianza_inferior"].iloc[::-1]]),
-                fill="toself", fillcolor="rgba(52, 152, 219, 0.15)",
-                line=dict(color="rgba(255,255,255,0)"), hoverinfo="skip",
-                name="Intervalo de confianza"
-            ))
-
+        # ── Primeras 24h: solo valor real ──────────────────────────
         fig_mod.add_trace(go.Scatter(
-            x=pd.concat([df_mod["dateh"], df_mod["dateh"].iloc[::-1]]),
-            y=pd.concat([
-                df_mod["prediccion"] + df_mod["error_abs"],
-                (df_mod["prediccion"] - df_mod["error_abs"]).iloc[::-1]
-            ]),
-            fill="toself", fillcolor="rgba(231, 76, 60, 0.05)",
-            line=dict(color="rgba(255,255,255,0)"), hoverinfo="skip",
-            name="Banda de error absoluto"
-        ))
-
-        fig_mod.add_trace(go.Scatter(
-            x=df_mod["dateh"], y=df_mod["valor_real"],
+            x=df_mod_real["dateh"], y=df_mod_real["valor_real"],
             mode="lines", name="Valor Real",
             line=dict(color="#1A252F", width=2),
             hovertemplate="<b>%{x}</b><br>Real: %{y:.4f}<extra></extra>"
         ))
 
-        fig_mod.add_trace(go.Scatter(
-            x=df_mod["dateh"], y=df_mod["prediccion"],
-            mode="lines", name="Predicción",
-            line=dict(color="#2980B9", width=2, dash="dot"),
-            hovertemplate="<b>%{x}</b><br>Pred: %{y:.4f}<extra></extra>"
-        ))
+        # ── Línea vertical divisoria entre las dos ventanas ────────
+        fig_mod.add_vline(
+            x=fecha_24h, line_color="#95A5A6",
+            line_width=1.5, line_dash="dash"
+        )
+
+        # ── Segundas 24h: intervalo de confianza + banda error + real + predicción ──
+        if "confianza_inferior" in df_mod_pred.columns and "confianza_superior" in df_mod_pred.columns and not df_mod_pred.empty:
+            fig_mod.add_trace(go.Scatter(
+                x=pd.concat([df_mod_pred["dateh"], df_mod_pred["dateh"].iloc[::-1]]),
+                y=pd.concat([df_mod_pred["confianza_superior"], df_mod_pred["confianza_inferior"].iloc[::-1]]),
+                fill="toself", fillcolor="rgba(52, 152, 219, 0.15)",
+                line=dict(color="rgba(255,255,255,0)"), hoverinfo="skip",
+                name="Intervalo de confianza"
+            ))
+
+        if not df_mod_pred.empty:
+            fig_mod.add_trace(go.Scatter(
+                x=pd.concat([df_mod_pred["dateh"], df_mod_pred["dateh"].iloc[::-1]]),
+                y=pd.concat([
+                    df_mod_pred["prediccion"] + df_mod_pred["error_abs"],
+                    (df_mod_pred["prediccion"] - df_mod_pred["error_abs"]).iloc[::-1]
+                ]),
+                fill="toself", fillcolor="rgba(231, 76, 60, 0.05)",
+                line=dict(color="rgba(255,255,255,0)"), hoverinfo="skip",
+                name="Banda de error absoluto"
+            ))
+
+            fig_mod.add_trace(go.Scatter(
+                x=df_mod_pred["dateh"], y=df_mod_pred["valor_real"],
+                mode="lines", name="Valor Real (backtest)",
+                line=dict(color="#1A252F", width=1.5, dash="dot"),
+                hovertemplate="<b>%{x}</b><br>Real: %{y:.4f}<extra></extra>"
+            ))
+
+            fig_mod.add_trace(go.Scatter(
+                x=df_mod_pred["dateh"], y=df_mod_pred["prediccion"],
+                mode="lines", name="Predicción",
+                line=dict(color="#2980B9", width=2, dash="dot"),
+                hovertemplate="<b>%{x}</b><br>Pred: %{y:.4f}<extra></extra>"
+            ))
+
+        # ── Anotación divisoria ────────────────────────────────────
+        fig_mod.add_annotation(
+            x=fecha_24h, y=1.02, yref="paper",
+            text="<b>↑ Pronóstico 24h</b>",
+            showarrow=False,
+            font=dict(size=FONT_ANNOTATION, color="#555"),
+            xanchor="left", bgcolor="rgba(255,255,255,0.8)",
+            bordercolor="#CBD5E0", borderwidth=1, borderpad=3
+        )
 
         fig_mod.update_layout(
             title=dict(text=f"<b>Real vs. Predicción — Modelo: {modelo_sel}</b>", font=dict(size=FONT_SECTION_TITLE), x=0.0),
@@ -842,29 +945,6 @@ with tab3:
             )
         )
 
-        fig_err = go.Figure()
-        fig_err.add_trace(go.Bar(
-            x=df_mod["dateh"], y=df_mod["error"],
-            marker=dict(color=df_mod["error"].apply(lambda v: "rgba(231,76,60,0.7)" if v > 0 else "rgba(39,174,96,0.7)")),
-            name="Error (Real − Predicción)",
-            hovertemplate="<b>%{x}</b><br>Error: %{y:.4f}<extra></extra>"
-        ))
-        fig_err.add_hline(y=0, line_color="#1A252F", line_width=1.5)
-        fig_err.update_layout(
-            title=dict(text="<b>Error de Predicción en el Tiempo</b>", font=dict(size=FONT_SECTION_TITLE), x=0.0),
-            paper_bgcolor="#F7F9FC", plot_bgcolor="#FFFFFF", height=300,
-            margin=dict(t=55, b=50, l=60, r=30), font=dict(family="Arial, sans-serif"),
-            # ← xaxis2 enlazado al xaxis de fig_mod via matches="x" en el HTML combinado
-            xaxis=dict(
-                title="Fecha/Hora", title_font=dict(size=FONT_AXIS_TITLE),
-                tickfont=dict(size=FONT_AXIS_TICK), gridcolor="#ECF0F1"
-            ),
-            yaxis=dict(
-                title="Error", title_font=dict(size=FONT_AXIS_TITLE),
-                tickfont=dict(size=FONT_AXIS_TICK), gridcolor="#ECF0F1", zeroline=False
-            ),
-            showlegend=False
-        )
 # ============================================================
         # CÁLCULO DE VENTANAS ROJA Y VERDE — Q1 y Q3 por día
         # Verde: horas donde predicción <= Q1 del día  ← umbral bajo diario
@@ -872,6 +952,8 @@ with tab3:
         # ============================================================
 
         # Detectar paso temporal entre registros
+        # Ventana verde solo aplica en las segundas 24h (donde hay predicción)
+        df_mod = df_mod_pred.copy() if not df_mod_pred.empty else df_mod
         todos_ts = sorted(df_mod["dateh"].tolist())
         paso = (pd.Timestamp(todos_ts[1]) - pd.Timestamp(todos_ts[0])) if len(todos_ts) > 1 else pd.Timedelta(hours=1)
 
@@ -881,9 +963,8 @@ with tab3:
         cuartiles.columns = ["_q1", "_q3"]
         df_mod = df_mod.join(cuartiles, on="_dia")
 
-        # Registros que cumplen cada condición (hora exacta)
+        # Registros que cumplen la condición verde (hora exacta)
         df_verde = df_mod[df_mod["prediccion"] <= df_mod["_q1"]].copy()
-        df_rojo  = df_mod[df_mod["prediccion"] >= df_mod["_q3"]].copy()
 
         # Agrupar registros consecutivos en intervalos para vrect
         def construir_intervalos_horarios(df_filtrado, paso_temporal):
@@ -904,57 +985,30 @@ with tab3:
             intervalos.append((inicio, fin + paso_temporal))
             return intervalos
 
-        intervalos_rojo  = construir_intervalos_horarios(df_rojo,  paso)
         intervalos_verde = construir_intervalos_horarios(df_verde, paso)
         # ============================================================
         # ============================================================
         # ── Combinamos los dos en un solo figura con subplots para sincronizar el zoom ──
         fig_combined = make_subplots(
-            rows=2, cols=1,
-            shared_xaxes=True,   # ← ESTO es lo que sincroniza el zoom entre ambos
-            vertical_spacing=0.12,
-            subplot_titles=[
-                f"<b>Real vs. Predicción — Modelo: {modelo_sel}</b>",
-                "<b>Error de Predicción en el Tiempo</b>"
-            ],
-            row_heights=[0.65, 0.35]
+            rows=1, cols=1,
+            subplot_titles=[f"<b>Real vs. Predicción — Modelo: {modelo_sel}</b>"]
         )
 
-        # -- Copiar trazas de fig_mod --
-# -- Copiar trazas de fig_mod --
         for trace in fig_mod.data:
             fig_combined.add_trace(trace, row=1, col=1)
 
-        # -- Copiar trazas de fig_err --
-        for trace in fig_err.data:
-            fig_combined.add_trace(trace, row=2, col=1)
-
-        # ── Sombreados ventana roja (ambas filas) ──────────────────
-        for x0, x1 in intervalos_rojo:
-            for row_n in [1, 2]:
-                fig_combined.add_vrect(
-                    x0=x0, x1=x1,
-                    fillcolor="rgba(180, 30, 20, 0.20)",   # ← color ventana roja
-                    opacity=1, layer="below", line_width=0,
-                    row=row_n, col=1
-                )
-
-        # ── Sombreados ventana verde (ambas filas) ─────────────────
+        # ── Sombreados ventana verde ───────────────────────────────
         for x0, x1 in intervalos_verde:
-            for row_n in [1, 2]:
-                fig_combined.add_vrect(
-                    x0=x0, x1=x1,
-                    fillcolor="rgba(20, 140, 60, 0.20)",   # ← color ventana verde
-                    opacity=1, layer="below", line_width=0,
-                    row=row_n, col=1
-                )
-
+            fig_combined.add_vrect(
+                x0=x0, x1=x1,
+                fillcolor="rgba(20, 140, 60, 0.20)",
+                opacity=1, layer="below", line_width=0,
+                row=1, col=1
+            )
         # ── Leyenda manual de ventanas en el título ────────────────
         fig_combined.add_annotation(
             x=1.0, y=1.06, xref="paper", yref="paper",
-            text=("<b style='color:#E74C3C'>▌ Ventana Roja</b>: predicción ≥ Q3 del día"
-                  "&nbsp;&nbsp;&nbsp;"
-                  "<b style='color:#27AE60'>▌ Ventana Verde</b>: predicción ≤ Q1 del día"),
+            text="<b style='color:#27AE60'>▌ Ventana Verde</b>: predicción ≤ Q1 del día",
             showarrow=False,
             font=dict(size=FONT_ANNOTATION, color="#444"),   # ← tamaño leyenda ventanas
             xanchor="right", align="right",
@@ -964,14 +1018,13 @@ with tab3:
 
         fig_combined.update_layout(
             paper_bgcolor="#F7F9FC", plot_bgcolor="#FFFFFF",
-            height=750, hovermode="x unified",
+            height=520, hovermode="x unified",
             legend=dict(orientation="h", y=-0.08, x=0.5, xanchor="center", font=dict(size=FONT_LEGEND)),
             margin=dict(t=80, b=60, l=60, r=30),
             font=dict(family="Arial, sans-serif")
         )
         fig_combined.update_yaxes(title_text="Valor", title_font=dict(size=FONT_AXIS_TITLE), tickfont=dict(size=FONT_AXIS_TICK), gridcolor="#ECF0F1", row=1, col=1)
-        fig_combined.update_yaxes(title_text="Error", title_font=dict(size=FONT_AXIS_TITLE), tickfont=dict(size=FONT_AXIS_TICK), gridcolor="#ECF0F1", zeroline=False, row=2, col=1)
-        fig_combined.update_xaxes(title_text="Fecha/Hora", title_font=dict(size=FONT_AXIS_TITLE), tickfont=dict(size=FONT_AXIS_TICK), gridcolor="#ECF0F1", showgrid=True, row=2, col=1)
+
         for ann in fig_combined.layout.annotations:
             ann.font.size = FONT_SECTION_TITLE - 2
 
