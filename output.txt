@@ -1,0 +1,304 @@
+=== FEATURES YA PRESENTES EN EL PARQUET ===
+year, month, day, dayofweek, quarter, week, grco2_kwh_lag_1h, grco2_kwh_lag_2h, grco2_kwh_lag_3h, grco2_kwh_lag_4h, grco2_kwh_lag_5h, grco2_kwh_lag_6h, grco2_kwh_lag_7h, grco2_kwh_lag_8h, grco2_kwh_lag_9h, grco2_kwh_lag_10h, grco2_kwh_lag_11h, grco2_kwh_lag_12h, grco2_kwh_lag_13h, grco2_kwh_lag_14h, grco2_kwh_lag_15h, grco2_kwh_lag_16h, grco2_kwh_lag_17h, grco2_kwh_lag_18h, grco2_kwh_lag_19h, grco2_kwh_lag_20h, grco2_kwh_lag_21h, grco2_kwh_lag_22h, grco2_kwh_lag_23h, grco2_kwh_lag_24h, grco2_kwh_avg_1d, grco2_kwh_avg_2d, grco2_kwh_avg_3d, grco2_kwh_trend, total_aportes_lag1, total_aportes_lag7, total_aportes_lag30, total_aportes_avg7d, total_aportes_avg30d, es_festivo, es_fin_semana, es_festivo_largo, month_sin, month_cos, day_sin, day_cos, dayofweek_sin, dayofweek_cos, quarter_sin, quarter_cos, week_sin, week_cos, dateh_ts
+=== NUEVAS FEATURES QUE SE CREARAN ===
+hour, hour_sin, hour_cos, is_weekend, lag_48, lag_72, lag_168, roll_std_24, roll_min_24, roll_max_24, roll_std_48, roll_min_48, roll_max_48, roll_std_72, roll_min_72, roll_max_72, roll_std_168, roll_min_168, roll_max_168
+=== RANGOS TEMPORALES ===
+Entrenamiento: 2022-02-07 00:00:00 -> 2025-11-29 23:00:00 (33480 filas)
+Test:          2025-11-30 00:00:00 -> 2025-12-29 23:00:00 (720 filas)
+=== VALIDACION TEMPORAL (TimeSeriesSplit) ===
+Fold 1: train 2022-02-07 00:00:00 -> 2025-10-25 23:00:00 (32640 filas) | validacion 2025-10-26 00:00:00 -> 2025-11-01 23:00:00 (168 filas)
+Fold 2: train 2022-02-07 00:00:00 -> 2025-11-01 23:00:00 (32808 filas) | validacion 2025-11-02 00:00:00 -> 2025-11-08 23:00:00 (168 filas)
+Fold 3: train 2022-02-07 00:00:00 -> 2025-11-08 23:00:00 (32976 filas) | validacion 2025-11-09 00:00:00 -> 2025-11-15 23:00:00 (168 filas)
+Fold 4: train 2022-02-07 00:00:00 -> 2025-11-15 23:00:00 (33144 filas) | validacion 2025-11-16 00:00:00 -> 2025-11-22 23:00:00 (168 filas)
+Fold 5: train 2022-02-07 00:00:00 -> 2025-11-22 23:00:00 (33312 filas) | validacion 2025-11-23 00:00:00 -> 2025-11-29 23:00:00 (168 filas)
+
+Optimizando horizonte +1h
+Fitting 5 folds for each of 30 candidates, totalling 150 fits
+Mejores parámetros:
+{'subsample': 1.0, 'reg_lambda': 10, 'reg_alpha': 0, 'n_estimators': 1000, 'min_child_weight': 5, 'max_depth': 5, 'learning_rate': 0.03, 'gamma': 0, 'colsample_bytree': 0.9}
+
+Optimizando horizonte +6h
+Fitting 5 folds for each of 30 candidates, totalling 150 fits
+Mejores parámetros:
+{'subsample': 1.0, 'reg_lambda': 1, 'reg_alpha': 0, 'n_estimators': 500, 'min_child_weight': 10, 'max_depth': 5, 'learning_rate': 0.05, 'gamma': 0.1, 'colsample_bytree': 0.7}
+
+Optimizando horizonte +12h
+Fitting 5 folds for each of 30 candidates, totalling 150 fits
+Mejores parámetros:
+{'subsample': 1.0, 'reg_lambda': 5, 'reg_alpha': 0.1, 'n_estimators': 1000, 'min_child_weight': 1, 'max_depth': 3, 'learning_rate': 0.1, 'gamma': 0.5, 'colsample_bytree': 0.8}
+
+Optimizando horizonte +24h
+Fitting 5 folds for each of 30 candidates, totalling 150 fits
+Mejores parámetros:
+{'subsample': 1.0, 'reg_lambda': 10, 'reg_alpha': 0, 'n_estimators': 1000, 'min_child_weight': 5, 'max_depth': 5, 'learning_rate': 0.03, 'gamma': 0, 'colsample_bytree': 0.9}
+
+Optimizando horizonte +48h
+Fitting 5 folds for each of 30 candidates, totalling 150 fits
+Mejores parámetros:
+{'subsample': 0.7, 'reg_lambda': 10, 'reg_alpha': 0.1, 'n_estimators': 500, 'min_child_weight': 3, 'max_depth': 3, 'learning_rate': 0.03, 'gamma': 0.5, 'colsample_bytree': 0.9}
+Entrenando modelo horizonte +1h
+Entrenando modelo horizonte +2h
+Entrenando modelo horizonte +3h
+Entrenando modelo horizonte +4h
+Entrenando modelo horizonte +5h
+Entrenando modelo horizonte +6h
+Entrenando modelo horizonte +7h
+Entrenando modelo horizonte +8h
+Entrenando modelo horizonte +9h
+Entrenando modelo horizonte +10h
+Entrenando modelo horizonte +11h
+Entrenando modelo horizonte +12h
+Entrenando modelo horizonte +13h
+Entrenando modelo horizonte +14h
+Entrenando modelo horizonte +15h
+Entrenando modelo horizonte +16h
+Entrenando modelo horizonte +17h
+Entrenando modelo horizonte +18h
+Entrenando modelo horizonte +19h
+Entrenando modelo horizonte +20h
+Entrenando modelo horizonte +21h
+Entrenando modelo horizonte +22h
+Entrenando modelo horizonte +23h
+Entrenando modelo horizonte +24h
+Entrenando modelo horizonte +25h
+Entrenando modelo horizonte +26h
+Entrenando modelo horizonte +27h
+Entrenando modelo horizonte +28h
+Entrenando modelo horizonte +29h
+Entrenando modelo horizonte +30h
+Entrenando modelo horizonte +31h
+Entrenando modelo horizonte +32h
+Entrenando modelo horizonte +33h
+Entrenando modelo horizonte +34h
+Entrenando modelo horizonte +35h
+Entrenando modelo horizonte +36h
+Entrenando modelo horizonte +37h
+Entrenando modelo horizonte +38h
+Entrenando modelo horizonte +39h
+Entrenando modelo horizonte +40h
+Entrenando modelo horizonte +41h
+Entrenando modelo horizonte +42h
+Entrenando modelo horizonte +43h
+Entrenando modelo horizonte +44h
+Entrenando modelo horizonte +45h
+Entrenando modelo horizonte +46h
+Entrenando modelo horizonte +47h
+Entrenando modelo horizonte +48h
+Residuales OOS +1h: 840 observaciones
+Residuales OOS +2h: 840 observaciones
+Residuales OOS +3h: 840 observaciones
+Residuales OOS +4h: 840 observaciones
+Residuales OOS +5h: 840 observaciones
+Residuales OOS +6h: 840 observaciones
+Residuales OOS +7h: 840 observaciones
+Residuales OOS +8h: 840 observaciones
+Residuales OOS +9h: 840 observaciones
+Residuales OOS +10h: 840 observaciones
+Residuales OOS +11h: 840 observaciones
+Residuales OOS +12h: 840 observaciones
+Residuales OOS +13h: 840 observaciones
+Residuales OOS +14h: 840 observaciones
+Residuales OOS +15h: 840 observaciones
+Residuales OOS +16h: 840 observaciones
+Residuales OOS +17h: 840 observaciones
+Residuales OOS +18h: 840 observaciones
+Residuales OOS +19h: 840 observaciones
+Residuales OOS +20h: 840 observaciones
+Residuales OOS +21h: 840 observaciones
+Residuales OOS +22h: 840 observaciones
+Residuales OOS +23h: 840 observaciones
+Residuales OOS +24h: 840 observaciones
+Residuales OOS +25h: 840 observaciones
+Residuales OOS +26h: 840 observaciones
+Residuales OOS +27h: 840 observaciones
+Residuales OOS +28h: 840 observaciones
+Residuales OOS +29h: 840 observaciones
+Residuales OOS +30h: 840 observaciones
+Residuales OOS +31h: 840 observaciones
+Residuales OOS +32h: 840 observaciones
+Residuales OOS +33h: 840 observaciones
+Residuales OOS +34h: 840 observaciones
+Residuales OOS +35h: 840 observaciones
+Residuales OOS +36h: 840 observaciones
+Residuales OOS +37h: 840 observaciones
+Residuales OOS +38h: 840 observaciones
+Residuales OOS +39h: 840 observaciones
+Residuales OOS +40h: 840 observaciones
+Residuales OOS +41h: 840 observaciones
+Residuales OOS +42h: 840 observaciones
+Residuales OOS +43h: 840 observaciones
+Residuales OOS +44h: 840 observaciones
+Residuales OOS +45h: 840 observaciones
+Residuales OOS +46h: 840 observaciones
+Residuales OOS +47h: 840 observaciones
+Residuales OOS +48h: 840 observaciones
+    horizonte        MAE       RMSE
+0           1   4.814500   6.400097
+1           2   5.785286   7.657837
+2           3   7.226419   9.376285
+3           4   8.359010  10.653980
+4           5   8.499121  10.978527
+5           6   9.350939  11.917317
+6           7   9.302729  12.106077
+7           8   9.563937  12.439984
+8           9  10.155193  12.889564
+9          10  12.634311  15.736794
+10         11  10.791719  13.946118
+11         12  14.099158  17.623056
+12         13  14.529843  17.575497
+13         14  14.529351  18.058683
+14         15  14.271852  17.791087
+15         16  13.209991  17.003068
+16         17  14.736266  18.106860
+17         18  12.927116  16.508574
+18         19  12.550511  15.716198
+19         20  12.844248  16.187733
+20         21  12.381837  15.655788
+21         22  12.858132  16.202000
+22         23  13.293540  16.703764
+23         24  13.886869  17.322887
+24         25  14.496246  17.853875
+25         26  14.129795  17.145756
+26         27  14.773567  18.008576
+27         28  14.593723  17.939504
+28         29  15.465609  19.114484
+29         30  15.799834  19.636007
+30         31  15.828255  19.042475
+31         32  16.036974  19.535087
+32         33  16.052289  19.551190
+33         34  15.894056  19.287906
+34         35  15.977161  19.541985
+35         36  14.950987  18.509951
+36         37  14.744931  18.073477
+37         38  14.501150  17.939149
+38         39  14.814940  18.000035
+39         40  14.552504  17.655458
+40         41  14.542651  17.672863
+41         42  14.438296  17.455222
+42         43  14.725361  18.013817
+43         44  14.870664  17.928343
+44         45  14.755673  18.061438
+45         46  14.736592  17.965042
+46         47  14.491812  17.650613
+47         48  14.564741  17.594916
+    horizonte        MAE       RMSE  MAE_baseline  RMSE_baseline   mejora_%
+0           1   4.814500   6.400097      6.902565       8.699301  30.250560
+1           2   5.785286   7.657837      9.577389      11.753013  39.594333
+2           3   7.226419   9.376285     11.990162      14.500160  39.730432
+3           4   8.359010  10.653980     14.148378      16.881948  40.918953
+4           5   8.499121  10.978527     15.988070      18.949667  46.840859
+5           6   9.350939  11.917317     17.573713      20.621409  46.790192
+6           7   9.302729  12.106077     18.875384      21.994984  50.715024
+7           8   9.563937  12.439984     19.826471      23.032579  51.761779
+8           9  10.155193  12.889564     20.460583      23.781706  50.367039
+9          10  12.634311  15.736794     20.845695      24.288704  39.391273
+10         11  10.791719  13.946118     20.942977      24.605671  48.470940
+11         12  14.099158  17.623056     20.787138      24.682324  32.173642
+12         13  14.529843  17.575497     20.445717      24.527162  28.934540
+13         14  14.529351  18.058683     19.868074      24.162992  26.870861
+14         15  14.271852  17.791087     19.055053      23.540564  25.102009
+15         16  13.209991  17.003068     18.179963      22.681662  27.337638
+16         17  14.736266  18.106860     17.092956      21.557655  13.787492
+17         18  12.927116  16.508574     15.779235      20.216274  18.075145
+18         19  12.550511  15.716198     14.391662      18.742846  12.793175
+19         20  12.844248  16.187733     13.044719      17.274107   1.536804
+20         21  12.381837  15.655788     11.906862      16.021560  -3.989082
+21         22  12.858132  16.202000     11.001641      15.135109 -16.874677
+22         23  13.293540  16.703764     10.612597      14.847774 -25.261894
+23         24  13.886869  17.322887     11.250443      15.338334 -23.433973
+24         25  14.496246  17.853875     12.693945      16.432661 -14.198123
+25         26  14.129795  17.145756     14.363599      17.890540   1.627755
+26         27  14.773567  18.008576     16.020543      19.542947   7.783604
+27         28  14.593723  17.939504     17.596390      21.185047  17.064108
+28         29  15.465609  19.114484     19.010438      22.721715  18.646748
+29         30  15.799834  19.636007     20.251939      24.077165  21.983598
+30         31  15.828255  19.042475     21.225349      25.236973  25.427586
+31         32  16.036974  19.535087     21.930583      26.148508  26.873926
+32         33  16.052289  19.551190     22.305899      26.762126  28.035677
+33         34  15.894056  19.287906     22.484957      27.196936  29.312491
+34         35  15.977161  19.541985     22.485623      27.433173  28.944991
+35         36  14.950987  18.509951     22.402958      27.461591  33.263332
+36         37  14.744931  18.073477     22.130635      27.291709  33.373214
+37         38  14.501150  17.939149     21.596066      26.926338  32.852816
+38         39  14.814940  18.000035     20.838437      26.353078  28.905703
+39         40  14.552504  17.655458     20.017771      25.517711  27.302076
+40         41  14.542651  17.672863     18.999059      24.470344  23.455944
+41         42  14.438296  17.455222     17.924820      23.228785  19.450820
+42         43  14.725361  18.013817     16.922496      21.929723  12.983519
+43         44  14.870664  17.928343     15.999200      20.687136   7.053703
+44         45  14.755673  18.061438     15.196749      19.612017   2.902439
+45         46  14.736592  17.965042     14.636449      18.887465  -0.684202
+46         47  14.491812  17.650613     14.435912      18.658896  -0.387231
+47         48  14.564741  17.594916     14.962473      19.054793   2.658196
+        fecha_predicha  horizonte  prediccion    lower_95    upper_95
+0  2025-12-30 00:00:00          1  154.766800  143.553819  170.785702
+1  2025-12-30 01:00:00          2  152.389816  138.637532  171.331439
+2  2025-12-30 02:00:00          3  152.456589  137.216954  173.623241
+3  2025-12-30 03:00:00          4  139.659210  121.320246  161.367526
+4  2025-12-30 04:00:00          5  126.853714  108.515389  149.966894
+5  2025-12-30 05:00:00          6  120.878845  100.344924  145.744475
+6  2025-12-30 06:00:00          7  124.989624  104.428092  148.870680
+7  2025-12-30 07:00:00          8  120.194473   98.216482  144.102421
+8  2025-12-30 08:00:00          9  123.824638  104.399525  147.686032
+9  2025-12-30 09:00:00         10  125.798309  103.765184  151.409978
+10 2025-12-30 10:00:00         11  116.137283   89.526737  140.749400
+11 2025-12-30 11:00:00         12  116.919731   91.533777  141.814808
+12 2025-12-30 12:00:00         13  109.303902   82.590062  132.454051
+13 2025-12-30 13:00:00         14  125.471275   94.425114  149.659572
+14 2025-12-30 14:00:00         15  107.597923   81.062949  132.148787
+15 2025-12-30 15:00:00         16  107.321114   79.091760  133.289553
+16 2025-12-30 16:00:00         17  109.653679   82.420225  136.333156
+17 2025-12-30 17:00:00         18  120.766373   91.968828  145.461464
+18 2025-12-30 18:00:00         19  121.282784   94.250119  146.558563
+19 2025-12-30 19:00:00         20  130.529007  106.323523  154.983876
+20 2025-12-30 20:00:00         21  136.464645  113.289301  161.895735
+21 2025-12-30 21:00:00         22  137.067978  113.898485  162.252472
+22 2025-12-30 22:00:00         23  138.583878  112.679149  166.697066
+23 2025-12-30 23:00:00         24  137.847687  116.840599  167.643985
+24 2025-12-31 00:00:00         25  141.411469  116.404076  172.461430
+25 2025-12-31 01:00:00         26  145.263412  120.036971  180.130592
+26 2025-12-31 02:00:00         27  152.824448  128.665510  182.929985
+27 2025-12-31 03:00:00         28  140.551010  115.084136  171.272270
+28 2025-12-31 04:00:00         29  134.651764  110.111429  168.692955
+29 2025-12-31 05:00:00         30  119.686882   95.656870  152.580112
+30 2025-12-31 06:00:00         31  117.412003   88.550755  148.533959
+31 2025-12-31 07:00:00         32  117.543213   87.857261  149.358683
+32 2025-12-31 08:00:00         33  124.914604   93.626967  156.493629
+33 2025-12-31 09:00:00         34  111.481682   75.686536  146.192934
+34 2025-12-31 10:00:00         35  116.910461   86.766271  150.042902
+35 2025-12-31 11:00:00         36  127.426567   94.666095  159.669437
+36 2025-12-31 12:00:00         37  122.886116   96.178326  159.645745
+37 2025-12-31 13:00:00         38  128.453033   99.858474  166.777189
+38 2025-12-31 14:00:00         39  119.907715   92.959212  153.908915
+39 2025-12-31 15:00:00         40  127.938118   98.941320  160.318243
+40 2025-12-31 16:00:00         41  135.730743  106.922709  171.281514
+41 2025-12-31 17:00:00         42  136.651794  107.168886  173.796424
+42 2025-12-31 18:00:00         43  135.848740  106.684810  171.238113
+43 2025-12-31 19:00:00         44  133.766617  105.105373  168.559941
+44 2025-12-31 20:00:00         45  133.627533  102.297669  167.524276
+45 2025-12-31 21:00:00         46  134.878128  105.540313  167.914875
+46 2025-12-31 22:00:00         47  145.965973  116.068509  181.467612
+47 2025-12-31 23:00:00         48  150.366852  118.822183  185.822768
+                 fecha    real_+1h   pred_+1h  baseline_+1h   lower_95    upper_95  error_abs
+0  2025-11-30 00:00:00   96.139003  99.666489    102.727827  88.406951  114.234817   3.527485
+1  2025-11-30 01:00:00   99.991522  92.839531     97.379559  80.582611  107.398353   7.151991
+2  2025-11-30 02:00:00  100.069274  91.506172     96.139003  79.749896  108.612226   8.563102
+3  2025-11-30 03:00:00   97.610030  93.663597     99.991522  81.798918  107.573692   3.946433
+4  2025-11-30 04:00:00   88.627786  90.653641    100.069274  78.894654  103.249430   2.025855
+5  2025-11-30 05:00:00   90.893484  88.155800     97.610030  76.417461  103.928760   2.737685
+6  2025-11-30 06:00:00   90.747145  79.521255     88.627786  68.253699   93.431350  11.225890
+7  2025-11-30 07:00:00   88.191112  82.354507     90.893484  70.618878   95.441185   5.836604
+8  2025-11-30 08:00:00   93.171640  84.313568     90.747145  72.444491   99.264435   8.858072
+9  2025-11-30 09:00:00   96.049233  85.835228     88.191112  73.053031  100.403556  10.214005
+10 2025-11-30 10:00:00   85.400106  91.421440     93.171640  79.686340  105.961804   6.021334
+11 2025-11-30 11:00:00   78.272992  95.766060     96.049233  84.023322  108.367968  17.493068
+12 2025-11-30 12:00:00   82.699833  88.533333     85.400106  76.774346  107.975085   5.833500
+13 2025-11-30 13:00:00   87.148754  82.361992     78.272992  70.216772   97.772336   4.786762
+14 2025-11-30 14:00:00   87.865721  86.990761     82.699833  75.126082  102.410030   0.874960
+15 2025-11-30 15:00:00   96.500186  92.019028     87.148754  79.874781  105.482466   4.481158
+16 2025-11-30 16:00:00   91.717756  94.063766     87.865721  82.199088  107.139019   2.346010
+17 2025-11-30 17:00:00   86.618978  95.188942     96.500186  83.044696  110.961903   8.569964
+18 2025-11-30 18:00:00   82.615816  89.631523     91.717756  78.051211  103.524984   7.015707
+19 2025-11-30 19:00:00   83.705553  88.864761     86.618978  77.283828  103.405125   5.159208
+Resumen +1h -> MAE: 4.8145, RMSE: 6.4001
+Baseline +1h -> MAE: 6.9026, RMSE: 8.6993
