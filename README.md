@@ -137,6 +137,16 @@ Archivo completo en `requirements.txt`.
 | **R²** | Coeficiente de Determinación — proporción de varianza explicada por el modelo |
 | **Cobertura IC** | % de observaciones reales dentro del intervalo de confianza estimado |
 
+## Extracción y almacenamiento de datos
+`proyecto_integrador` contiene la ingesta y el componente de analitica/ML del proyecto. Desde este repositorio se consumen los datos publicos de SIMEM, se almacenan en Amazon S3 en la capa `bronze` y se define la tuberia de entrenamiento en Amazon SageMaker para construir y evaluar modelos de prediccion sobre las tablas refinadas.
+
+`proyecto_integrador_glue_pipeline` contiene la capa de ingenieria de datos en AWS Glue. Desde este repositorio se despliegan y ejecutan los jobs que transforman los archivos JSON crudos desde `bronze` hacia `silver`, generan la capa `gold` de features para modelado y actualizan los crawlers y catalogos necesarios para su consumo en Athena y otras herramientas analiticas.
+
+La arquitectura general, el flujo de datos y los `GitHub Actions` asociados se documentan en el diagrama ![Diagrama de arquitectura](arquitectura_integrador_aws.png).
+
+1. [santfirax/proyecto_integrador_glue_pipeline](https://github.com/santfirax/proyecto_integrador_glue_pipeline): despliegue y ejecucion de pipelines AWS Glue para capas silver y gold.
+2. [santfirax/proyecto_integrador](https://github.com/santfirax/proyecto_integrador): ingesta de datos SIMEM y pipeline de entrenamiento en SageMaker.
+
 ---
 
 ## ⚠️ Limitaciones
@@ -161,6 +171,7 @@ Archivo completo en `requirements.txt`.
 Este proyecto fue desarrollado con fines académicos como entrega final del 
 **Proyecto Integrador** de la Maestría en Ciencia de Datos y Analítica de la 
 Universidad EAFIT. No está destinado a uso comercial.
+
 
 ---
 
