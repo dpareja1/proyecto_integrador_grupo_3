@@ -142,7 +142,7 @@ Archivo completo en `requirements.txt`.
 
 `proyecto_integrador_glue_pipeline` contiene la capa de ingenieria de datos en AWS Glue. Desde este repositorio se despliegan y ejecutan los jobs que transforman los archivos JSON crudos desde `bronze` hacia `silver`, generan la capa `gold` de features para modelado y actualizan los crawlers y catalogos necesarios para su consumo en Athena y otras herramientas analiticas.
 
-La arquitectura general, el flujo de datos y los `GitHub Actions` asociados se documentan en el diagrama ![Diagrama de arquitectura](arquitectura_integrador_aws).
+La arquitectura general, el flujo de datos y los `GitHub Actions` asociados se documentan en el diagrama ![Diagrama de arquitectura](arquitectura_integrador_aws.png).
 
 1. [santfirax/proyecto_integrador_glue_pipeline](https://github.com/santfirax/proyecto_integrador_glue_pipeline): despliegue y ejecucion de pipelines AWS Glue para capas silver y gold.
 2. [santfirax/proyecto_integrador](https://github.com/santfirax/proyecto_integrador): ingesta de datos SIMEM y pipeline de entrenamiento en SageMaker.
